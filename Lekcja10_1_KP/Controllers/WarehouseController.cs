@@ -14,15 +14,23 @@ namespace lekcja10_KP_1.Controllers
     [ApiController]
     public class WarehouseController : ControllerBase
     {
-       [HttpGet]
-        public IActionResult Get()
+        [HttpGet("Orders")]
+        public IActionResult GetOrders()
         {
             var dane = new _2019sbdContext().Orders;
             return Ok(dane);
         }
+        [HttpGet("ProductWarhouse")]
+        public IActionResult GetProductWarehouse()
+        {
+            var dane = new _2019sbdContext().ProductWarehouses;
+            return Ok(dane);
+        }
+
         [HttpPost("AddOrder")]
         public IActionResult AddOrder(int Idproduct, int IdWarehouse, int amount, DateTime createdAt)
         {
+            //createdAt = DateTime.Now;
             var context = new _2019sbdContext();
             var isproduct = context.Products.Where(p => p.IdProduct == Idproduct).Any();
             var iswarehouse = context.Warehouses.Where(w => w.IdWarehouse == IdWarehouse).Any();
@@ -38,14 +46,13 @@ namespace lekcja10_KP_1.Controllers
             {
                 return BadRequest("Zła ilość");
             }
-            var orderid = -11;
+            var orderid = -1;
             var order = context.Orders.Where(o => o.IdProduct == Idproduct && o.Amount == amount && o.CreatedAt < createdAt).SingleOrDefault();
-            if (!order.Equals(null))
+            if (!(order == null))
             {
                 order.FulfilledAt = DateTime.Now;
                 orderid = order.IdOrder;
             }
-            orderid = -1;
 
             if (orderid < 0)
             {
@@ -59,44 +66,22 @@ namespace lekcja10_KP_1.Controllers
 
             ProductWarehouse insert = new ProductWarehouse();
             var product = context.Products.Where(p => p.IdProduct == Idproduct).SingleOrDefault();
+            var productwarehousesid = context.ProductWarehouses.ToList().Count;
             if (!product.Equals(null))
             {
                 decimal price = product.Price * amount;
-
                 insert.IdProduct = Idproduct;
                 insert.IdWarehouse = IdWarehouse;
                 insert.Amount = amount;
                 insert.CreatedAt = DateTime.Now;
                 insert.Price = price;
                 insert.IdOrder = orderid;
+                insert.IdProductWarehouse = productwarehousesid;
                 context.ProductWarehouses.Add(insert);
             }
             context.SaveChanges();
-
-            return Ok(insert.IdProductWarehouse);
-
+            return Ok(productwarehousesid);
         }
-      
-    /*    public int Insert(int Warehouseid, int Productid, int Orderid, int Amount)
-        {
-            var context = new _2019sbdContext();
-            ProductWarehouse insert = new ProductWarehouse();
-            var product = context.Products.Where(p => p.IdProduct == Productid).SingleOrDefault();
-            if (!product.Equals(null))
-            {
-                decimal price = product.Price * Amount;
-
-                insert.IdProduct = Productid;
-                insert.IdWarehouse = Warehouseid;
-                insert.Amount = Amount;
-                insert.CreatedAt = DateTime.Now;
-                insert.Price = price;
-                insert.IdOrder = Orderid;
-                context.ProductWarehouses.Add(insert);
-                context.SaveChanges();
-                return insert.IdProductWarehouse;
-            }
-            return -1;
-       */ }
     }
+}
 
