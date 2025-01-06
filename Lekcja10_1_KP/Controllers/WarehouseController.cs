@@ -14,20 +14,22 @@ namespace lekcja10_KP_1.Controllers
     [ApiController]
     public class WarehouseController : ControllerBase
     {
+        //metoda używana w testowaniu
         [HttpGet("Orders")]
         public IActionResult GetOrders()
         {
             var dane = new _2019sbdContext().Orders;
             return Ok(dane);
         }
-        [HttpGet("ProductWarhouse")]
+        //metoda używana w testowaniu
+        [HttpGet("ProductWarehouse")]
         public IActionResult GetProductWarehouse()
         {
             var dane = new _2019sbdContext().ProductWarehouses;
             return Ok(dane);
         }
 
-        [HttpPost("AddOrder")]
+        [HttpPost("AddProductWarehouse")]
         public IActionResult AddOrder(int Idproduct, int IdWarehouse, int amount, DateTime createdAt)
         {
             //createdAt = DateTime.Now;
@@ -48,7 +50,7 @@ namespace lekcja10_KP_1.Controllers
             }
             var orderid = -1;
             var order = context.Orders.Where(o => o.IdProduct == Idproduct && o.Amount == amount && o.CreatedAt < createdAt).SingleOrDefault();
-            if (!(order == null))
+            if (order != null)
             {
                 order.FulfilledAt = DateTime.Now;
                 orderid = order.IdOrder;
@@ -67,7 +69,7 @@ namespace lekcja10_KP_1.Controllers
             ProductWarehouse insert = new ProductWarehouse();
             var product = context.Products.Where(p => p.IdProduct == Idproduct).SingleOrDefault();
             var productwarehousesid = context.ProductWarehouses.ToList().Count;
-            if (!product.Equals(null))
+            if (product != null)
             {
                 decimal price = product.Price * amount;
                 insert.IdProduct = Idproduct;
