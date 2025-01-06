@@ -34,9 +34,9 @@ namespace lekcja10_KP_1.Controllers
         {
             //createdAt = DateTime.Now;
             var context = new _2019sbdContext();
-            var isproduct = context.Products.Where(p => p.IdProduct == Idproduct).Any();
+            var product = context.Products.Where(p => p.IdProduct == Idproduct).SingleOrDefault();
             var iswarehouse = context.Warehouses.Where(w => w.IdWarehouse == IdWarehouse).Any();
-            if (!isproduct)
+            if (product==null)
             {
                 return BadRequest("Produkt nie istnieje");
             }
@@ -67,10 +67,8 @@ namespace lekcja10_KP_1.Controllers
             }
 
             ProductWarehouse insert = new ProductWarehouse();
-            var product = context.Products.Where(p => p.IdProduct == Idproduct).SingleOrDefault();
             var productwarehousesid = context.ProductWarehouses.ToList().Count;
-            if (product != null)
-            {
+           
                 decimal price = product.Price * amount;
                 insert.IdProduct = Idproduct;
                 insert.IdWarehouse = IdWarehouse;
@@ -80,9 +78,8 @@ namespace lekcja10_KP_1.Controllers
                 insert.IdOrder = orderid;
                 insert.IdProductWarehouse = productwarehousesid;
                 context.ProductWarehouses.Add(insert);
-            }
-            context.SaveChanges();
-            return Ok(productwarehousesid);
+                context.SaveChanges();
+                return Ok(productwarehousesid);
         }
     }
 }
